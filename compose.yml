@@ -1,0 +1,30 @@
+services:
+  phsp-bugzilla:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: /root/docker/startup.sh
+    volumes:
+      - phsp-bugzilla:/var/www/html/data
+      - .:/mnt/sync
+      - /home/prodadmin/letsencrypt:/usr/local/apache2/conf/letsencrypt
+    tmpfs:
+      - /tmp
+      - /run/lock
+    ports:
+      - 8094:80
+      - 4447:443
+    environment:
+      - BZ_ADMIN_EMAIL=admin@pahasp.com
+      - BZ_ADMIN_REALNAME=admin
+      # Change this to the IP or hostname of your remote DB server
+      - BZ_DB_HOST=${BZ_DB_HOST}
+      - BZ_DB_PORT=${BZ_DB_PORT}          # match the port you exposed in your mariadb container (3309)
+      - BZ_DB_USER=${BZ_DB_USER}
+      - BZ_DB_NAME=${BZ_DB_NAME}
+      - BZ_DB_PASS=${BZ_DB_PASS}
+      - BZ_URLBASE=http://127.0.0.1:8094/
+      - TZ=Asia/Kolkata
+volumes:
+  phsp-bugzilla:
+

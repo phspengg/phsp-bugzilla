@@ -49,13 +49,13 @@ RUN apt-get -y install \
  libmysqlclient-dev \
  graphviz \
  vim-common
+
 # Ubuntu22 doesn't ship new enough versions of a few modules, so get them from CPAN
 RUN cpan install Template::Toolkit Email::Address::XS Email::Sender DBD::MariaDB
 
 WORKDIR /var/www/html
 COPY --chown=root:www-data . /var/www/html
 COPY ./docker/000-default.conf /etc/apache2/sites-available/000-default.conf
-COPY ./docker/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
 COPY ./docker /root/docker
 
 # we don't want Docker droppings accessible by the web browser since they
@@ -64,9 +64,5 @@ RUN rm -rf /var/www/html/docker* /var/www/html/Dockerfile*
 RUN rm -rf /var/www/html/data /var/www/html/localconfig /var/www/html/index.html && \
     mkdir /var/www/html/data
 RUN a2enmod expires && a2enmod headers && a2enmod rewrite && a2dismod mpm_event && a2enmod mpm_prefork
-RUN apt update && \
-    apt install -y apache2 ssl-cert && \
-    a2enmod ssl && \
-    a2ensite default-ssl
 EXPOSE 80/tcp
 CMD docker/startup.sh
